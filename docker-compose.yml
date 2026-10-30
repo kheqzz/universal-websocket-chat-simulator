@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  simulator:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_DEFAULT_WS_URL=${VITE_DEFAULT_WS_URL:-}
+      - VITE_DEFAULT_API_URL=${VITE_DEFAULT_API_URL:-}
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://simulator:3000
+    depends_on:
+      - simulator
+    restart: unless-stopped
